@@ -199,18 +199,18 @@ besides making sentence-training. Then execute the script
 
 # A simple walkthrough of the core
 
-The program is composed of Scheme and C/C++ code. The high-level control and 
-prepocessing are handled by Scheme code. The low-level training algorithm is 
-written in C/C++ code.
+The code is composed of Scheme, C/C++ code and some other languages. The 
+high-level control and prepocessing are handled by Scheme code. The low-level 
+training algorithm is written in C/C++ code.
 
-The highest-level control of the sentence training algorithms (ML-based and 
-DT-based) is in file sentence-training.sc. The entry of the program is 
+The highest-level control of the algorithm is in file sentence-training.sc, with
+the entry of the program: 
 ``` scheme
 (define-command
   (main
 ```
 
-A lot of preprocessing stuff will happen after this, including setting different 
+Some preprocessings are executed after this, including setting different 
 kinds of parameters, reading/generating object detections and optical flows, 
 initializing HMMs, etc. Then the code will call the following functions in sequence:
 ``` scheme
@@ -245,8 +245,8 @@ initializing HMMs, etc. Then the code will call the following functions in seque
 
 Bindings between Scheme and C/C++ code can be found in hmm-wbm.sc, idealib-tracks.sc, and idealib-stuff.sc.
 
-Inside C/C++ code, the estimation algorithms happen mainly in hmm-control.c (ML) and hmm-likelihood-AD.cpp 
-(DT). Other files handle low-level functions.
+Inside C/C++ code, the estimation algorithms reside mainly in hmm-control.c (ML) and hmm-likelihood-AD.cpp 
+(DT). Other files contain low-level helper functions.
 
 
 Finally, the trained models will be returned by (sentence-training-iterative-multiple), together 
