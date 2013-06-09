@@ -106,38 +106,37 @@ The CUDA SDK must be installed at /usr/local/NVIDIA_GPU_Computing_SDK/
 such that /usr/local/NVIDIA_GPU_Computing_SDK/C/common/inc contains
 the header files.
 
-This release relies upon iRobot's implementation of the star detector
-which cannot be shipped with this archive and must be acquired
-directly from iRobot. This version must be placed in the install
-directory if you want to generate detections from scratch video:
+iRobot's implementation of the star detector cannot be shipped 
+with this archive and must be acquired directly from iRobot. This 
+tar file must be placed in the sentence-training directory if you 
+want to generate detections from raw video:
 
 ```bash
 irobot_libcudafelz_1.2-roi-9999.tar.gz
 ```
 
-We also offer precomputed optical flows and detections along with the
-dataset if the above requirements can't be met. The code can read
-these precomputed stuff for training. In this case, nothing need to be
-done at this moment.
+In case that the above requirements can't be met, we also offer 
+precomputed optical flows and detections within the dataset. The 
+short-version code can read these precomputed stuff for training. 
 
 For either version, before running the installation, you have to
 specify your system architecture with respect to these three
 makefiles:
 
 ```bash
-~/sentence-training/scheme2c/makefile, ~/sentence-training/install-i686
+~/sentence-training/install-i686 (w.r.t ~/sentence-training/scheme2c/makefile)
 ~/sentence-training/QobiScheme-makefile
 ~/sentence-training/darpa-collaboration/ideas/makefile
 ```
 
 Please search keywords 'Haonan's architecture' in these files to see
-how to specify them. However, the options in each makefile should
+how to specify them. Note that the options in each makefile should
 depend on your own system.
 
 To install this package first append the contents of dot-bashrc
 to your .bashrc file
 ```
-  cat dot-bashrc >>~/.bashrc
+  cat dot-bashrc >> ~/.bashrc
 ```
 and then execute
 ``` 
@@ -171,29 +170,42 @@ To build the pipeline execute
   cd `architecture-path`
   darpa-wrap make -j6 sentence-training
 ```
-in ~/darpa-collaboration/ideas
+in ~/darpa-collaboration/ideas. If you don't have CUDA or irobot's package, 
+there may be several warnings during compiling. You can just ignore them.
 
 Two examples of the pipeline are executed at the end of the run script:
 
 ```bash
 ~/darpa-collaboration/bin/sentence-training.sh ~/sentence-training/sample-dataset
-~/darpa-collaboration/bin/sentence-likelihood.sh ~/sentence-training/sample-dataset "The person approached the trash-can" MVI_0820.mov ~/sentence-training/sample-dataset/new3-hand-models.sc /tmp/result.sc
+~/darpa-collaboration/bin/sentence-likelihood.sh ~/sentence-training/sample-dataset 
+"The person approached the trash-can" MVI_0820.mov 
+~/sentence-training/sample-dataset/new3-hand-models.sc /tmp/result.sc
 ```
+
+The first one is to train word models from a small sample dataset. The second
+one is to compute the likelihood for a video-sentence pair given hand-written 
+models.
 
 # A simple walkthrough of the core
 
-The program is composed of Scheme and C/C++ code. The high-level control and prepocessing are handled by Scheme code. The low-level training algorithm is written in C/C++ code.
+The program is composed of Scheme and C/C++ code. The high-level control and 
+prepocessing are handled by Scheme code. The low-level training algorithm is 
+written in C/C++ code.
 
-The highest-level control of the sentence training algorithms (ML-based and DT-based) is in file sentence-training.sc. The entry of the program is 
+The highest-level control of the sentence training algorithms (ML-based and 
+DT-based) is in file sentence-training.sc. The entry of the program is 
 ``` scheme
 (define-command
   (main
 ```
 
-A lot of preprocessing stuff will happen after this, including setting different kinds of parameters, reading/generating object detections and optical flows, initializing HMMs, etc. Then the code will call the following functions in sequence:
+A lot of preprocessing stuff will happen after this, including setting different 
+kinds of parameters, reading/generating object detections and optical flows, 
+initializing HMMs, etc. Then the code will call the following functions in sequence:
 ``` scheme
                                 (sentence-training-iterative-multiple) 
-;; Randomly initialize the HMM parameters for a certain amount of times, then pick the trained models 
+;; Randomly initialize the HMM parameters for a certain amount of times, then 
+;; pick the trained models 
 ;; with the best result. This is done to avoid bad local minima.
                                                  |
                                                  |
@@ -226,7 +238,8 @@ Inside C/C++ code, the estimation algorithms happen mainly in hmm-control.c (ML)
 (DT). Other files handle low-level functions.
 
 
-Finally, the trained models will be returned by (sentence-training-iterative-multiple), together with the objective function value. 
+Finally, the trained models will be returned by (sentence-training-iterative-multiple), together 
+with the objective function value. 
 
 # Acknowledgements
 
