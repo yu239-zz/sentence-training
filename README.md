@@ -1,26 +1,15 @@
-# Video In Sentences Out
+# Sentence Training
 
-This file contains the release of the code for Video In Sentences Out,
-UAI 2012.
+This file contains the release of the code for Grounded Language
+Learning from Video Described with Sentences, Haonan Yu and Jeffrey
+Mark Siskind, ACL 2013.
 
-It was developed by the Purdue-University of South Carolina-University
-of Toronto team under the DARPA Mind's Eye program. 
+Most of the infrastructure was developed by the Purdue-University of
+South Carolina-University of Toronto team under the DARPA Mind's Eye
+program. The core algorithm of *sentence training* was developed by
+the CCCP group at Purdue University.
 
-Lead PI:
-```
-  Jeffrey Mark Siskind
-  School of Electrical and Computer Engineering
-  Purdue University
-  465 Northwestern Avenue
-  Lafayette IN 47907-2035 USA
-  voice: +1 765 496-3197
-  FAX:   +1 765 494-6440
-  qobi@purdue.edu
-  ftp://ftp.ecn.purdue.edu/qobi
-  http://engineering.purdue.edu/~qobi
-```
-
-Components of this release were written by:
+Components of the infrastructure were written by:
 ```
    Andrei Barbu
    Alexander Bridge
@@ -52,8 +41,9 @@ and others.
 
 # License
 
-All code written by the Purdue-lead team, including the code in ideas/, is
-copyright Purdue University 2010, 2011, and 2012.  All rights reserved.
+All code written by the Purdue-lead team, including the code in
+ideas/, is copyright Purdue University 2010, 2011, 2012, and 2013.
+All rights reserved.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -73,7 +63,41 @@ by their respective licenses.
 
 # Instructions
 
-Getting this package set up is not for the faint of heart, it has many dependencies. It also depends on closed-source code which must be obtained from iRobot. See below.
+Getting this package set up is not for the faint of heart, it has many
+dependencies. It also depends on closed-source code which must be
+obtained from iRobot. See below. The installation has been tested on
+both 32bits- and 64bits-linux machines with matlab2010a and
+gcc-4.4. There may be some changes to be made by the user besides
+those listed below.
+
+Make sure you have matlab installed. The matlab binary must be in
+$PATH and it must be a symlink of the form
+<toplevel-matlab-directory>/bin/matlab. The include and lib
+directories should be in the include and library path, or you could
+specify them in 
+
+```bash
+~/sentence-training/darpa-collaboration/ideas/makefile
+```
+
+The contents of this archive must be unpacked into your home directory
+and will create an ~/sentence-training/ directory.
+
+We provide two versions of the sentence-training code. The full
+version requires CUDA installed and the closed-source code from irobot
+and it can generate object detections and compute optical flows from
+raw video. The presets for the full-version code:
+
+Uncomment
+```bash
+#OPTIONS=-DV4L2_S2C_BACKTRACES -DUSE_IROBOT_FELZ
+```
+in ~/sentence-training/darpa-collaboration/ideas/makefile
+```bash
+cd ~/sentence-training/darpa-collaboration/ideas
+cp ./with-cuda-irobot/* ./
+cd -
+```
 
 CUDA must be installed at /usr/local/cuda such that
 /usr/local/cuda/include/ contains the header files.
@@ -82,20 +106,33 @@ The CUDA SDK must be installed at /usr/local/NVIDIA_GPU_Computing_SDK/
 such that /usr/local/NVIDIA_GPU_Computing_SDK/C/common/inc contains
 the header files.
 
-The Matlab binary must be in $PATH and it must be a symlink of the form
-<toplevel-matlab-directory>/bin/matlab.
-
-The contents of this archive must be unpacked into your home directory
-and will create an ~/video-to-sentences-t28feb2012/ directory.
-
-This release relies upon iRobot's implementation of the star detector which
-cannot be shipped with this archive and must be acquired directly from
-iRobot. This version must be placed in the install directory before running the
-installer and named:
+This release relies upon iRobot's implementation of the star detector
+which cannot be shipped with this archive and must be acquired
+directly from iRobot. This version must be placed in the install
+directory if you want to generate detections from scratch video:
 
 ```bash
-irobot_libcudafelz_1.3_alpha_toolkit_3.2_64bit.tar.gz
+irobot_libcudafelz_1.2-roi-9999.tar.gz
 ```
+
+We also offer precomputed optical flows and detections along with the
+dataset if the above requirements can't be met. The code can read
+these precomputed stuff for training. In this case, nothing need to be
+done at this moment.
+
+For either version, before running the installation, you have to
+specify your system architecture with respect to these three
+makefiles:
+
+```bash
+~/sentence-training/scheme2c/makefile, ~/sentence-training/install-i686
+~/sentence-training/QobiScheme-makefile
+~/sentence-training/darpa-collaboration/ideas/makefile
+```
+
+Please search keywords 'Haonan's architecture' in these files to see
+how to specify them. However, the options in each makefile should
+depend on your own system.
 
 To install this package first append the contents of dot-bashrc
 to your .bashrc file
@@ -118,36 +155,78 @@ This will run a number of
 ```
 commands to fetch packages which this code depends on.
 
-This code is mostly-self-contained. It will install:
-*  an ~/.ffmpeg directory with an ffmpeg preset file required to
+This code is mostly-self-contained. On my system *i686-Ubuntu*, it will install:
+-  an ~/.ffmpeg directory with an ffmpeg preset file required to
     produce consistent output when rendering video
-*  ~/bin/x86_64-Debian, ~/lib/x86_64-Debian, and ~/include/x86_64-Debian which
+-  ~/bin/i686-Ubuntu, ~/lib/i686-Ubuntu, and ~/include/i686-Ubuntu which
     contain the installed Scheme->C and QobiScheme infrastructure
-*  ~/darpa-collaboration which contains our codebase
+-  ~/darpa-collaboration which contains our codebase
 
-~/darpa-collaboration/ideas contains the code for the video-to-sentences
+~/darpa-collaboration/ideas contains the code for the sentence-training
 pipeline.
 
 To build the pipeline execute
 ```
   darpa-wrap make port
-  cd x86_64-Debian
-  darpa-wrap make video-to-sentences
+  cd `architecture-path`
+  darpa-wrap make -j6 sentence-training
 ```
 in ~/darpa-collaboration/ideas
 
-An example of the pipeline in action is executed at the end of the run script:
+Two examples of the pipeline are executed at the end of the run script:
 
 ```bash
-darpa-wrap ~/darpa-collaboration/ideas/x86_64-Debian/video-to-sentences\
-   -write-object-detector -t 12 -cuda-object-detector -1 -0.1 0.6\
-   -cuda-klt -cuda-optical-flow -look-ahead 2\
-   -model-path ~/darpa-collaboration/voc4-models/\
-   -verbose\
-   -event-models-file ~/darpa-collaboration/event-hmms/event-models.text\
-   -m person,person-down,person-crouch\
-   ~/video-to-sentences-m27feb2012/Chase1_A1_C1_Act1_4_PARK1_ML_MIDD_DARK_4433d840-c5af-11df-bed3-e80688cb869a
+~/darpa-collaboration/bin/sentence-training.sh ~/sentence-training/sample-dataset
+~/darpa-collaboration/bin/sentence-likelihood.sh ~/sentence-training/sample-dataset "The person approached the trash-can" MVI_0820.mov ~/sentence-training/sample-dataset/new3-hand-models.sc /tmp/result.sc
 ```
+
+# A simple walkthrough of the core
+
+The program is composed of Scheme and C/C++ code. The high-level control and prepocessing are handled by Scheme code. The low-level training algorithm is written in C/C++ code.
+
+The highest-level control of the sentence training algorithms (ML-based and DT-based) is in file sentence-training.sc. The entry of the program is 
+``` scheme
+(define-command
+  (main
+```
+
+A lot of preprocessing stuff will happen after this, including setting different kinds of parameters, reading/generating object detections and optical flows, initializing HMMs, etc. Then the code will call the following functions in sequence:
+``` scheme
+                                (sentence-training-iterative-multiple) 
+;; Randomly initialize the HMM parameters for a certain amount of times, then pick the trained models 
+;; with the best result. This is done to avoid bad local minima.
+                                                 |
+                                                 |
+                                  (sentence-training-iterative-one)
+;; This is the main loop of iteratively updating the HMM parameters.
+                                                 |
+                                                 |
+                                                / \
+                                              /     \
+                                            /         \
+                                          /             \
+                  (sentence-training-multiple)       (gt-estimation-multiple)
+;; Both these two functions estimate the parameters from multiple training samples inside one iteration. 
+;; They will use ML-based and DT-based estimation algorithms respectively. ML-based one is the algorithm 
+;; proposed in the ACL 2013 paper. DT-based one is going to be presented in another paper.
+                               |                                  |
+                               |                                  |
+                     (sentence-training-one)              (gt-estimation-one)
+;; Estimate the parameters from one training sample. The estimation results will accumulated back to the 
+;; upper level functions.
+                               |                                  |
+                               |                                  |
+                          (update-x!)                (sentence-derivatives-one-video)
+;; The scheme bindings for C/C++ functions.
+```
+
+Bindings between Scheme and C/C++ code can be found in hmm-wbm.sc, idealib-tracks.sc, and idealib-stuff.sc.
+
+Inside C/C++ code, the estimation algorithms happen mainly in hmm-control.c (ML) and hmm-likelihood-AD.cpp 
+(DT). Other files handle low-level functions.
+
+
+Finally, the trained models will be returned by (sentence-training-iterative-multiple), together with the objective function value. 
 
 # Acknowledgements
 

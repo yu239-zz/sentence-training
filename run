@@ -4,7 +4,7 @@ set -o pipefail
 
 BUILD_CUDA=0
 
-#sudo ./packages.sh
+sudo ./packages.sh
 
 ./build-i686
 source ~/.bashrc

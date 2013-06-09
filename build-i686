@@ -25,5 +25,5 @@ cp ../../QobiScheme-makefile makefile
 make port
 cd ${ARCHITECTURE_PATH}
 make install -j6
-cd ..
-# rm -rf `architecture-path`
+popd
+rm -rf QobiScheme-1.46/

@@ -32,12 +32,13 @@ rsync -avz include/* ${INSTALLINCLUDEA}/gc/
 rsync -avz .libs/*.so* ${INSTALLLIBA}/
 rsync -avz .libs/*.a ${INSTALLLIBA}/
 popd
-#TODO CLEANUP rm -rf gc-7.2alpha6
+rm -rf gc-7.2alpha6
 
 source ~/.bashrc
 pushd scheme2c
 # Change these two lines according to your architecture
 # For example, "make forAMD64; cd AMD64" (64bits)
+# Haonan's architecture
 make forLINUX
 cd LINUX
 make -j10

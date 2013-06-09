@@ -7,7 +7,7 @@ mkdir -p ~/darpa-collaboration/bin/`architecture-path`
 mkdir -p ~/darpa-collaboration/include/`architecture-path`
 mkdir -p ~/darpa-collaboration/lib/`architecture-path`
 
-rm OpenCV-2.2.0 -R
+rm OpenCV-2.2.0 -Rf
 tar xvf ~/darpa-collaboration/pkg/sources/OpenCV-2.2.0.tar.bz2
 cd OpenCV-2.2.0
 cmake -DCMAKE_INSTALL_PREFIX=install -DWITH_PNG=OFF -DWITH_FFMPEG=OFF -DWITH_V4L=OFF
