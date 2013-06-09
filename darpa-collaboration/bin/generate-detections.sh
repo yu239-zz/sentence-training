@@ -12,4 +12,4 @@ darpa-wrap $HOME/darpa-collaboration/ideas/`architecture-path`/video-to-sentence
     -in-place -model-path ~/darpa-collaboration/new3-models \
     -rank-box-colors -stop-before-tracker \
     -alpha 14 -new3-corpus-cfg -hmms \
-    ~/new3/$VIDEO
+    $VIDEO
