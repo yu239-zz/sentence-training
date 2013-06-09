@@ -177,14 +177,25 @@ Two examples of the pipeline are executed at the end of the run script:
 
 ```bash
 ~/darpa-collaboration/bin/sentence-training.sh ~/sentence-training/sample-dataset
-~/darpa-collaboration/bin/sentence-likelihood.sh ~/sentence-training/sample-dataset 
-"The person approached the trash-can" MVI_0820.mov 
-~/sentence-training/sample-dataset/new3-hand-models.sc /tmp/result.sc
+~/darpa-collaboration/bin/sentence-likelihood.sh ~/sentence-training/sample-dataset \
+    "The person approached the trash-can" MVI_0820.mov \
+    ~/sentence-training/sample-dataset/new3-hand-models.sc /tmp/result.sc
 ```
 
 The first one is to train word models from a small sample dataset. The second
 one is to compute the likelihood for a video-sentence pair given hand-written 
 models.
+
+If you want to generate detections from raw video in the beginning, you have 
+to do additionally
+```bash
+darpa-wrap make -j6 video-to-sentences
+```
+besides making sentence-training. Then execute the script 
+```bash
+~/darpa-collaboration/bin/generated-detections.sh <your-video-path>
+```
+
 
 # A simple walkthrough of the core
 
