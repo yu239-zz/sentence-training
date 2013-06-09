@@ -1,0 +1,33 @@
+% attentionRegionDetection
+%
+% Yuewei Lin
+% Yu Cao
+%
+% Jan 8th 2012
+
+1. How to compile
+Just simply type 'make' in this source folder.
+
+2. How to run attention region detection
+Uising following command in matlab,
+======================================================================================================
+Attention_Region_Detection('videosListFile', '<absolute path of videosListFile.txt>', ...
+				'usingBatchMode', true, ... % default is false (using sequential mode)
+				'batchSize', 1, ... % default is 0 in the sequential mode,
+						    % batchSize is how many videos will be processed by
+						    % the same process, if using 1, means using one process
+						    % for each video.
+				'targetThreshold', 0.15, ... % default value
+				'backgroundThreshold', 0.08, ... % default value
+				'targetAreaRatioThreshold', 0.002, ... % default value
+				'backgroundAreaRatioThreshold', 0.4); % default value
+======================================================================================================
+You need a video's list file, e.g. videosListFile.txt, in which each line is the name for a video. Make sure
+the path information of these videos are already in darpa-corpora.text.
+
+
+3. Data folder structure
+Before run the attention region detection, in each video folder, there must be a folder called 'images' which
+has the expanded frames of the video. After run the attention region detection, there will be a folder 'attentions'
+in the video folder, a file 'attentions.txt' contains the attention region information for all the frames
+in this video and this file will be used by LSVM_Motatt_Detection.

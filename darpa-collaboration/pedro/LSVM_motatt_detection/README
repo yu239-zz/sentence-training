@@ -1,0 +1,46 @@
+% duffle-bag/cardboard-box detection code with wrappers.
+%
+% Sanja Filder
+% Yu Cao
+% Jan 8th 2012
+
+1. How to compile the code:
+Just type 'make' in this source folder.
+
+2. How to run the object detection:
+You need to create a videos list file, e.g. videosList.txt, in which each line is the name of a processing video's name.
+Then you need make sure that the corresponding video information are in the darpa-corpora.text file, namely the corresponding
+relative folder path of the videos with respect to '~/video-datasets/'.
+
+Then you need to have the object defomable parts model file, e.g. 'duffle-bag.mat'. Then in the matlab, simply run
+
+===================================================================================================================
+LSVM_Motatt_Detection('videosListFile', '<absolute path of the videosList.txt>', ...
+			'objectModelFile', '<absolute path of the object model file, e.g. duffle-bag.mat>', ...
+			'usingBatchMode', true, ...   % default is false, which is sequential mode,
+							% in the batchMode, the detection will be run on the
+							% background by matlab scripts
+			'batchSize', 1, ... % default is 0 in the sequential mode,
+						% batchSize is how many videos will be processed by the same process.
+						% using '1' means each video will be processed by a single process.
+			'imResizeRatio', 1.5, ... % image resize ratio, default value 1.5
+			'attentionResizeRatio', 2); % attention region resize ratio, default value 1.5
+===================================================================================================================
+
+The parameter options: 'usingBatchMode', 'batchSize', 'imResizeRatio' and 'attentionResizeRatio' are optional. When
+running without explicitly assigning the values for these optional parameters, their default values are used.
+
+3. Data folder structures
+The previous step of this object detection code is generating attention regions data. Under each video folder, there will
+be a folder 'images' which has the expanded video frames. And aslo there will be a folder 'attentions' which contains
+the attention region detection results for each frame after you run the attention region detection. The detection code 
+will automatically go to these folders to find the useful data to use.
+
+After you run the LSVM_Motatt_Detection, there will be a 'LSVM-results' folder in the video folder 
+ which contains the object detection results.Then you can use the following command in matlab to create 
+VOC4_overgenerated-<object name>.smoothed-tracked-boxes file, which can be further used to do tracking.
+
+===================================================================================================================
+CreateVOCDetectionFile('videosListFile', '<absolute path for videosList.txt>', ...
+			'objectModelFile', '<absolute path for object model file, e.g. duffle-bag.mat>');
+==================================================================================================================

@@ -1,0 +1,26 @@
+#!/bin/bash
+
+EXPECTED_ARGS=6
+E_BADARGS=65
+
+if [ $# -ne $EXPECTED_ARGS ]
+then
+  echo "Usage: `basename $0` training-samples-directory model-name videos-datasets corpus-directory root-filters parts"
+  echo "Trainig samples directory should contain [model-name]-{positives,negatives}.text"
+  echo "Creates training-samples-directory/model-name/model-name_final.mat"
+  echo "corpus-directory is something along the lines of C-D2b/Country_Road_1"
+  echo "Make sure to run 'make && matlab -r compile' in the detector directory"
+  exit $E_BADARGS
+fi
+
+cd ~/darpa-collaboration/pedro/detector
+darpa-wrap matlab <<EOF
+addpath([getenv('HOME') '/darpa-collaboration/pedro/training'])
+addpath([getenv('HOME') '/darpa-collaboration/pedro/detector'])
+addpath([getenv('HOME') '/darpa-collaboration/ffmpeg'])
+createDataMatrix('$1','$2','$3/$4')
+model = training_pipeline('$4', '$1/${2}.mat', '$2', $5, '$1/$2/', $6, '$(date +%s)')
+save $1/${2}_final.mat model
+csc_model = convert_to_cascade_model('$1/${2}_final.mat', 5, '$3/$4', '$1/', '$1/', '$1/$2/cascade-temp')
+save $1/${2}_final_cascade.mat csc_model
+EOF

@@ -1,0 +1,59 @@
+To collect data use:
+get_contour_manually_new(<directory with samples .text file>,<corpus name>,<model name>,<offset into samples list>,<kind, always 'positives'>,<max number of samples>)
+get_contour_manually_new('/home/andrei/darpa-collaboration/data/C-D2a/person/','C-D2a','person',1,'positives',5)
+get_contour_manually_new('/net/zhineng/aux/yu239/new4-training-frames/','object-models-training','chair',1,'positives',20)
+in this example
+/home/andrei/darpa-collaboration/data/C-D2a/person/person.text
+must exist and contain lines of
+video-name frame-number
+ 
+mkdir /home/snarayan/darpa-collaboration/data/C-D2a/duffle-bag
+get_contour_manually_new('/home/snarayan/darpa-collaboration/data/C-D2a/duffle-bag/','C-D2a',duffle-bag,1,'positives',5)
+
+
+Old instructions (more complete but outdated):
+
+
+1) Run driver_text.m with input parameters: dirname,model,framejump,videonumber,framenumber
+where:
+
+Inputs:
+
+dirname: ~/video-datasets/C-D1b/voc4-models/modelname (modelname is name of the model)
+
+model: model class name
+
+framejump: number of frames to skip over
+
+
+videonumber: video number which you want to start collecting frames from
+
+framenumber: frame number which you want to start collecting positive sample from
+
+(videonumber and framenumber are option parameter, not giving these parameters sets both to 1, i.e starts from  videonumber 1 and frame number 1)
+
+
+output: model-positives.text and model-negatives.text in the dirname folder
+
+
+
+2) Next Run driver_matrix.m with input parameters : dirname , model, negativedir
+
+dirname and model parameters are same as in (1)
+
+negativedir: name for path to folder containing negative samples (format for negative directory is ~/negativedir/videoname/framenumber/frame-negative.ppm)
+
+
+
+
+example: driver_matrix('~/video-datasets/C-D1b/voc4-models/modelname','human','~/video-datasets/C-D1b/voc4-models/modelname/negativeforhumans');
+
+Note: You can skip certain positive frames by hiting enter but,when you get a message for gathering negative samples , you may not skip any frame by hiting enter (Reason is to keep number or postive and negative samples same)
+
+
+Output: driver_matrix.m creates a model.mat file which is to be used as input to the pedro detector
+
+All these files: model-positives.text, model-negatives.text,model.mat will be created in dirname folder
+
+get_contour_manually_new('/home/andrei/darpa-collaboration/data/new-corpus/backpack/','new-corpus','backpack',1,'positives',10000)
+createNegative('/home/andrei/darpa-collaboration/data/new-corpus/backpack','new-corpus', 'backpack')

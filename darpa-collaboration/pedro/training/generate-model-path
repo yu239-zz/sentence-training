@@ -1,0 +1,33 @@
+#!/bin/bash
+
+EXPECTED_ARGS=4
+E_BADARGS=65
+
+if [ $# -lt $EXPECTED_ARGS ]
+then
+  echo "Usage: `basename $0` parse-file path num-videos model*"
+  echo "parse-file: file (.csv) with video names and model names in the same row"
+  echo "path: location to create model list hierarchy"
+  echo "num-videos: number of randomly selected video to include in each list"
+  echo "model: models for which to generate lists"
+  exit $E_BADARGS
+fi
+
+file=$1
+file_path=$2
+num=$3
+shift
+shift
+shift
+
+while (( "$#" )); do
+	model=$1
+
+	mkdir -p $file_path/$model
+	
+	cat $file | grep ",$model," | awk -F, '{print $1}' > $file_path/$model/$model-all.text
+
+	~/darpa-collaboration/bin/randomize-video-list $file_path/$model/$model-all.text $num > $file_path/$model/$model.text
+
+	shift	
+done

@@ -1,0 +1,41 @@
+#!/bin/bash
+set -e
+set -o pipefail
+
+BUILD_CUDA=0
+
+#sudo ./packages.sh
+
+./build-i686
+source ~/.bashrc
+cp -r darpa-collaboration ~/
+~/darpa-collaboration/bin/build-architecture-libs
+~/darpa-collaboration/bin/install-ffmpeg-presets
+# Check irobot package
+if [ -f irobot_libcudafelz_1.2-roi-9999.tar.gz ]; then
+    tar -C ${HOME}/darpa-collaboration/pkg -xvf irobot_libcudafelz_1.2-roi-9999.tar.gz
+    BUILD_CUDA=1
+else
+    echo "Warning: The detector code will not work. You need a package (and license) from irobot, or you can read the recomputed detections in the dataset."
+fi
+~/darpa-collaboration/bin/build-opencv.sh
+~/darpa-collaboration/bin/build-flowlib.sh
+(( ${BUILD_CUDA} == 1 )) && ~/darpa-collaboration/bin/build-cudaklt.sh
+~/darpa-collaboration/bin/build-adolc.sh
+cp ~/darpa-collaboration/bin/darpa-wrap ~/bin/
+pushd ~/darpa-collaboration/ffmpeg
+darpa-wrap make ffmpeg ffmpeg-bindings
+darpa-wrap make install
+popd
+
+pushd ~/darpa-collaboration/ideas
+make port
+cd `architecture-path`
+darpa-wrap make sentence-training -j6
+popd
+
+echo "Running sentence training on an example"
+~/darpa-collaboration/bin/sentence-training.sh ~/sentence-training/sample-dataset
+
+echo "Calculating sentence likelihood on an example"
+~/darpa-collaboration/bin/sentence-likelihood.sh ~/sentence-training/sample-dataset "The person approached the trash-can" MVI_0820.mov ~/sentence-training/sample-dataset/new3-hand-models.sc /tmp/result.sc

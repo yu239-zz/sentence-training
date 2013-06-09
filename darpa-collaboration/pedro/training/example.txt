@@ -1,0 +1,1 @@
+get_contour_manually_new('/home/yu239/new4-training-frames/basketball','object-models-training','basketball',1,'positives',20)

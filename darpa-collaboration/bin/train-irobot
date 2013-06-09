@@ -1,0 +1,74 @@
+#!/bin/bash
+
+set -o errexit
+
+EXPECTED_ARGS=2
+E_BADARGS=65
+
+if [ $# -le $EXPECTED_ARGS ]
+then
+    echo "Usage: `basename $0` kind training-samples-root-directory model-names+"
+    echo "Trainig samples directory should contain [model]_final.mat and [model]_cascade_data_{det,pca0,pca5}.inf"
+    echo "kind is either plain or sparselets"
+    echo "Results go in <training-samples-root-directory>/voc4-models"
+    exit $E_BADARGS
+fi
+
+kind=$1
+directory=$2
+shift;
+shift;
+while (( "$#" )); do
+    models="$models $1"
+    shift
+done
+models="$models"
+
+rm -rf $directory/irobot-conversion
+mkdir $directory/irobot-conversion
+rm -rf $directory/voc4-models
+mkdir $directory/voc4-models
+mkdir $directory/voc4-models/CUDA-1.2
+mkdir $directory/voc4-models/cascade
+
+for m in $models; do 
+    cp $directory/$m/${m}_cascade_data_det.inf $directory/irobot-conversion/${m}_cascade_data_det.inf
+    cp $directory/$m/${m}_cascade_data_pca0.inf $directory/irobot-conversion/${m}_cascade_data_pca0.inf
+    cp $directory/$m/${m}_cascade_data_pca5.inf $directory/irobot-conversion/${m}_cascade_data_pca5.inf
+    case "$kind" in
+        "sparselets")
+            cp $directory/$m/${m}_final.mat $directory/irobot-conversion/$m.mat ;;
+        "plain") 
+            cp $directory/$m/${m}_final_cascade.mat $directory/irobot-conversion/$m.mat ;;
+        *) echo "'$kind' is not a valid kind of detector"; exit 1 ;;
+    esac
+done
+
+cd $directory/irobot-conversion
+case "$kind" in
+    "sparselets")
+        ~/darpa-collaboration/ideas/cupedro/convert-model-sparselets.sh $models ;;
+    "plain") 
+        ~/darpa-collaboration/ideas/cupedro/convert-model.sh $models ;;
+    *) echo "'$kind' is not a valid kind of detector"; exit 1 ;;
+esac
+
+cp /net/upplysingaoflun/aux/qobi/video-datasets/C-D1/voc4-models/CUDA-1.2/felz_pca_coeff.csv $directory/voc4-models/CUDA-1.2/
+case "$kind" in
+    "sparselets")
+        cp $directory/irobot-conversion/dictionary-*.mat $directory/voc4-models/CUDA-1.2/ ;;
+    "plain") ;;
+    *) echo "'$kind' is not a valid kind of detector"; exit 1 ;;
+esac
+
+for m in $models; do
+    cp $directory/$m/${m}_final.mat $directory/voc4-models/$m.mat
+    cp $directory/$m/${m}_final_cascade.mat $directory/voc4-models/cascade/$m.mat
+    case "$kind" in
+        "sparselets")
+            cp $directory/irobot-conversion/sparselet_model_${m}_n*_L*.bin $directory/voc4-models/CUDA-1.2/$m.irobot-felz-model ;;
+        "plain") 
+            cp $directory/irobot-conversion/$m.irobot-felz-model $directory/voc4-models/CUDA-1.2/$m.irobot-felz-model ;;
+        *) echo "'$kind' is not a valid kind of detector"; exit 1 ;;
+    esac
+done
