@@ -2,7 +2,8 @@
 
 This file contains the release of the code for Grounded Language
 Learning from Video Described with Sentences, Haonan Yu and Jeffrey
-Mark Siskind, ACL 2013.
+Mark Siskind, ACL 2013. For other resources, please see the 
+[project page](http://haonanyu.com/research/acl2013/).
 
 Most of the infrastructure was developed by the Purdue-University of
 South Carolina-University of Toronto team under the DARPA Mind's Eye
