@@ -93,7 +93,7 @@ Uncomment
 ```bash
 #OPTIONS=-DV4L2_S2C_BACKTRACES -DUSE_IROBOT_FELZ
 ```
-in ~/sentence-training/darpa-collaboration/ideas/makefile
+in ~/sentence-training/darpa-collaboration/ideas/makefile and then
 ```bash
 cd ~/sentence-training/darpa-collaboration/ideas
 cp ./with-cuda-irobot/* ./
@@ -198,7 +198,7 @@ besides making sentence-training. Then execute the script
 ```
 
 
-# A simple walkthrough of the core
+# A simple walkthrough of the code
 
 The code is composed of Scheme, C/C++ code and some other languages. The 
 high-level control and prepocessing are handled by Scheme code. The low-level 
